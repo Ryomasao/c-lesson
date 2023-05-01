@@ -5,7 +5,7 @@
             "name": "Launch Main",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/main.out",
+            "program": "/workspaces/c-lesson/sources/forth_modoki/02_int_parser_getc/parser",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
