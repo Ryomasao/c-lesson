@@ -17,21 +17,16 @@ int main()
     int index = 0;
     int row = 0;
 
-    while (input[position])
+    char *p = input;
+
+    while (*p)
     {
-        if (isdigit(input[position]))
+        if (isdigit(*p))
         {
-            a[row] = a[row] * 10;
-            a[row] += input[position] - '0';
+            a[row] = strtol(p, &p, 10);
+            row++;
         }
-        else
-        {
-            if (a[row] != 0)
-            {
-                row++;
-            }
-        }
-        position++;
+        p++;
     }
 
     int answer1 = 0;
