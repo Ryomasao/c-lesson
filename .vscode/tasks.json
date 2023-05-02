@@ -4,7 +4,7 @@
         {
             "label": "Build Main",
             "type": "shell",
-            "command": "cd /workspaces/c-lesson/sources/forth_modoki/05_eval_num && make",
+            "command": "cd /workspaces/c-lesson/sources/forth_modoki/06_literal_name && make",
             "group": {
                 "kind": "build",
                 "isDefault": true

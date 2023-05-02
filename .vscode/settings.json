@@ -7,6 +7,10 @@
   },
   "files.associations": {
     "string.h": "c",
-    "stdlib.h": "c"
+    "stdlib.h": "c",
+    "stack.h": "c",
+    "parser.h": "c",
+    "clesson.h": "c",
+    "stdbool.h": "c"
   }
 }
