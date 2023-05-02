@@ -4,5 +4,8 @@
   "editor.formatOnType": true,
   "[c]": {
     "editor.formatOnSave": true
+  },
+  "files.associations": {
+    "string.h": "c"
   }
 }
