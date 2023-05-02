@@ -5,7 +5,7 @@
             "name": "Launch Main",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/workspaces/c-lesson/sources/forth_modoki/04_stack/stack",
+            "program": "/workspaces/c-lesson/sources/forth_modoki/05_eval_num/eval",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
