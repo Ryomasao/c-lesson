@@ -79,16 +79,24 @@ int parse_one(int prev_ch, struct Token *out_token)
     /**
      * EXECUTABLE NAME
      */
-    if (isalnum(c))
+    if (isalpha(c))
     {
-        out_token->ltype = EXECUTABLE_NAME;
-        out_token->u.name = malloc(NAME_SIZE);
-        for (;;)
+        char buff[NAME_SIZE] = {0};
+
+        for (int i = 0; i < NAME_SIZE - 1; i++)
         {
-            strcat(out_token->u.name, (char *)&c);
-            c = cl_getc();
-            if (!isalnum(c))
+            if (isalnum(c))
+            {
+                buff[i] = c;
+                c = cl_getc();
+            }
+            else
+            {
+                out_token->ltype = EXECUTABLE_NAME;
+                out_token->u.name = malloc(i + 1);
+                strcpy(out_token->u.name, buff);
                 return c;
+            }
         }
     }
 
@@ -97,21 +105,31 @@ int parse_one(int prev_ch, struct Token *out_token)
      */
     if (c == '/')
     {
-        out_token->ltype = LITERAL_NAME;
-        out_token->u.name = malloc(NAME_SIZE);
+        // スラッシュは読み飛ばす
         c = cl_getc();
-
         if (!isalnum(c))
         {
             error("/の後に英数字がない");
         }
 
-        for (;;)
+        char buff[NAME_SIZE] = {0};
+
+        for (int i = 0; i < (NAME_SIZE - 1); i++)
         {
-            strcat(out_token->u.name, (char *)&c);
-            c = cl_getc();
-            if (!isalnum(c))
+            if (isalnum(c))
+            {
+                buff[i] = c;
+                c = cl_getc();
+            }
+            else
+            {
+                out_token->ltype = LITERAL_NAME;
+                out_token->u.name = malloc(i + 1);
+                // strcpyはbuffのNULL文字までをdistにcopyする
+                // buffは宣言時にNULL文字で初期化しているので、確保したメモリ以上をコピーすることはなさそう？
+                strcpy(out_token->u.name, buff);
                 return c;
+            }
         }
     }
 
