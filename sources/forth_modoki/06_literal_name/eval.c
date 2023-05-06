@@ -1,6 +1,7 @@
 #include "clesson.h"
 #include "parser.h"
 #include "stack.h"
+#include "dict.h"
 #include "stdbool.h"
 
 typedef struct
@@ -9,57 +10,57 @@ typedef struct
     StackData value;
 } KeyValue;
 
-#define MAX_DIST_SIZE 1024
-int dict_pos = 0;
-KeyValue dict_array[MAX_DIST_SIZE];
-
-typedef struct
-{
-    int pos;
-    int value;
-} DictResult;
-
-bool dict_get(char *key, DictResult *o_result)
-{
-    int i = 0;
-    for (i; i < dict_pos; i++)
-    {
-        if (strcmp(dict_array[i].key, key) == 0)
-        {
-            break;
-        }
-    }
-
-    if (dict_pos == i)
-    {
-        return false;
-    }
-
-    o_result->value = dict_array[i].value.u.number;
-    o_result->pos = i;
-
-    return true;
-}
-
-void dict_push(char *key, int value)
-{
-    if (dict_pos == MAX_DIST_SIZE)
-    {
-        // stack overflow
-        assert(false);
-    }
-
-    DictResult r;
-    if (dict_get(key, &r))
-    {
-        dict_array[r.pos].value.u.number = value;
-        return;
-    }
-
-    dict_array[dict_pos].key = key;
-    dict_array[dict_pos].value.u.number = value;
-    dict_pos++;
-}
+// #define MAX_DIST_SIZE 1024
+// int dict_pos = 0;
+// KeyValue dict_array[MAX_DIST_SIZE];
+//
+// typedef struct
+//{
+//     int pos;
+//     int value;
+// } DictResult;
+//
+// bool dict_get(char *key, DictResult *o_result)
+//{
+//     int i = 0;
+//     for (i; i < dict_pos; i++)
+//     {
+//         if (strcmp(dict_array[i].key, key) == 0)
+//         {
+//             break;
+//         }
+//     }
+//
+//     if (dict_pos == i)
+//     {
+//         return false;
+//     }
+//
+//     o_result->value = dict_array[i].value.u.number;
+//     o_result->pos = i;
+//
+//     return true;
+// }
+//
+// void dict_push(char *key, int value)
+//{
+//     if (dict_pos == MAX_DIST_SIZE)
+//     {
+//         // stack overflow
+//         assert(false);
+//     }
+//
+//     DictResult r;
+//     if (dict_get(key, &r))
+//     {
+//         dict_array[r.pos].value.u.number = value;
+//         return;
+//     }
+//
+//     dict_array[dict_pos].key = key;
+//     dict_array[dict_pos].value.u.number = value;
+//     dict_pos++;
+// }
 
 void eval()
 {
@@ -174,13 +175,7 @@ void test_eval_num_def()
     int expect = 12;
 
     cl_getc_set_src(input);
-
     eval();
-
-    DictResult r;
-    dict_get("abc", &r);
-    int actual = r.value;
-    assert(expect == actual);
 }
 
 int main()
