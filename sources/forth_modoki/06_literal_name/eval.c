@@ -22,6 +22,18 @@ void add_op()
     stack_push_number(l_v + r_v);
 }
 
+void def_op()
+{
+    StackData s_data;
+    int v;
+    char *literal_name;
+    stack_pop(&s_data);
+    v = s_data.u.number;
+    stack_pop(&s_data);
+    literal_name = s_data.u.name;
+    dict_push_number(literal_name, v);
+}
+
 void eval()
 {
     Token token = {UNKNOWN, {0}};
@@ -40,19 +52,8 @@ void eval()
 
         if (token.ltype == EXECUTABLE_NAME)
         {
-            if (strcmp(token.u.name, "def") == 0)
-            {
-                int v;
-                char *literal_name;
-                stack_pop(&s_data);
-                v = s_data.u.number;
-                stack_pop(&s_data);
-                literal_name = s_data.u.name;
-                dict_push_number(literal_name, v);
-                continue;
-            }
-
             NodeValue *v = dict_get(token.u.name);
+
             // 辞書に存在しない
             if (v == NULL)
             {
@@ -64,11 +65,19 @@ void eval()
                 v->u.cfunc();
                 continue;
             }
+            else
+            {
+                stack_push_number(v->u.number);
+                continue;
+            }
 
             // UNKOWN EXECUTABLE WORD
             assert(false);
         }
 
+        /**
+         * 変数宣言 eg) /abc
+         */
         if (token.ltype == LITERAL_NAME)
         {
             stack_push_name(token.u.name);
@@ -131,8 +140,8 @@ void test_eval_num_add()
 
 void test_eval_num_def()
 {
-    char *input = "/abc 12 def";
-    int expect = 12;
+    char *input = "/abc 123 def /efg 456 def abc efg add";
+    int expect = 579;
 
     cl_getc_set_src(input);
     eval();
@@ -141,6 +150,7 @@ void test_eval_num_def()
 void register_primitives()
 {
     dict_push_cfunc("add", add_op);
+    dict_push_cfunc("def", def_op);
 }
 
 int main()
