@@ -4,76 +4,44 @@
 #include "dict.h"
 #include "stdbool.h"
 
-typedef struct
-{
-    char *key;
-    StackData value;
-} KeyValue;
-
 void add_op()
 {
-    StackData s_data;
-    int l_v;
-    int r_v;
-    stack_pop(&s_data);
-    l_v = s_data.u.number;
-    stack_pop(&s_data);
-    r_v = s_data.u.number;
+    int r_v = stack_pop_number();
+    int l_v = stack_pop_number();
     stack_push_number(l_v + r_v);
 }
 
 void sub_op()
 {
-    StackData s_data;
-    int l_v;
-    int r_v;
-    stack_pop(&s_data);
-    l_v = s_data.u.number;
-    stack_pop(&s_data);
-    r_v = s_data.u.number;
-    stack_push_number(r_v - l_v);
+    int r_v = stack_pop_number();
+    int l_v = stack_pop_number();
+    stack_push_number(l_v - r_v);
 }
 
 void mul_op()
 {
-    StackData s_data;
-    int l_v;
-    int r_v;
-    stack_pop(&s_data);
-    l_v = s_data.u.number;
-    stack_pop(&s_data);
-    r_v = s_data.u.number;
+    int r_v = stack_pop_number();
+    int l_v = stack_pop_number();
     stack_push_number(l_v * r_v);
 }
 
 void div_op()
 {
-    StackData s_data;
-    int l_v;
-    int r_v;
-    stack_pop(&s_data);
-    l_v = s_data.u.number;
-    stack_pop(&s_data);
-    r_v = s_data.u.number;
-    stack_push_number(r_v / l_v);
+    int r_v = stack_pop_number();
+    int l_v = stack_pop_number();
+    stack_push_number(l_v / r_v);
 }
 
 void def_op()
 {
-    StackData s_data;
-    int v;
-    char *literal_name;
-    stack_pop(&s_data);
-    v = s_data.u.number;
-    stack_pop(&s_data);
-    literal_name = s_data.u.name;
+    int v = stack_pop_number();
+    char *literal_name = stack_pop_name();
     dict_push_number(literal_name, v);
 }
 
 void eval()
 {
     Token token = {UNKNOWN, {0}};
-    StackData s_data;
     int c;
 
     while (c != EOF)
@@ -131,9 +99,7 @@ void test_eval_num_one()
 
     eval();
 
-    StackData s_data;
-    stack_pop(&s_data);
-    int actual = s_data.u.number;
+    int actual = stack_pop_number();
     assert(expect == actual);
 }
 
@@ -147,13 +113,8 @@ void test_eval_num_two()
 
     eval();
 
-    StackData s_data;
-    stack_pop(&s_data);
-
-    int actual1 = s_data.u.number;
-
-    stack_pop(&s_data);
-    int actual2 = s_data.u.number;
+    int actual1 = stack_pop_number();
+    int actual2 = stack_pop_number();
 
     assert(expect1 == actual1);
     assert(expect2 == actual2);
@@ -168,9 +129,7 @@ void test_eval_num_add()
 
     eval();
 
-    StackData s_data;
-    stack_pop(&s_data);
-    int actual = s_data.u.number;
+    int actual = stack_pop_number();
     assert(expect == actual);
 }
 
@@ -183,9 +142,7 @@ void test_eval_num_sub()
 
     eval();
 
-    StackData s_data;
-    stack_pop(&s_data);
-    int actual = s_data.u.number;
+    int actual = stack_pop_number();
     assert(expect == actual);
 }
 
@@ -198,9 +155,7 @@ void test_eval_num_mul()
 
     eval();
 
-    StackData s_data;
-    stack_pop(&s_data);
-    int actual = s_data.u.number;
+    int actual = stack_pop_number();
     assert(expect == actual);
 }
 
@@ -213,9 +168,7 @@ void test_eval_num_div()
 
     eval();
 
-    StackData s_data;
-    stack_pop(&s_data);
-    int actual = s_data.u.number;
+    int actual = stack_pop_number();
     assert(expect == actual);
 }
 
@@ -227,9 +180,7 @@ void test_eval_num_def()
     cl_getc_set_src(input);
     eval();
 
-    StackData s_data;
-    stack_pop(&s_data);
-    int actual = s_data.u.number;
+    int actual = stack_pop_number();
     assert(expect == actual);
 }
 

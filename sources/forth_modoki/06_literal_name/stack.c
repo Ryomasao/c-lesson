@@ -2,6 +2,24 @@
 
 #define STACK_SIZE 1024
 
+enum StackDataType
+{
+    STACK_NUMBER,
+    STACK_NAME
+};
+
+union StackBody
+{
+    int number;
+    char *name;
+};
+
+typedef struct
+{
+    enum StackDataType type;
+    union StackBody u;
+} StackData;
+
 typedef struct
 {
     int pos;
@@ -15,35 +33,35 @@ void stack_initialize()
     stack.pos = 0;
 }
 
-bool stack_push_number(int data)
+void stack_push_number(int data)
 {
     if (stack.pos == STACK_SIZE)
-        return false;
+    {
+        assert(false);
+    }
 
     stack.data[stack.pos].type = STACK_NUMBER;
     stack.data[stack.pos]
         .u.number = data;
     stack.pos++;
-
-    return true;
 }
 
-bool stack_push_name(char *data)
+void stack_push_name(char *data)
 {
     if (stack.pos == STACK_SIZE)
-        return false;
+    {
+        assert(false);
+    }
 
     stack.data[stack.pos].type = STACK_NAME;
     stack.data[stack.pos].u.name = data;
     stack.pos++;
-
-    return true;
 }
 
-bool stack_pop(StackData *out_data)
+void stack_pop(StackData *out_data)
 {
     if (stack.pos == 0)
-        return false;
+        assert(false);
 
     stack.pos--;
 
@@ -60,26 +78,35 @@ bool stack_pop(StackData *out_data)
         out_data->u.name = t.u.name;
         break;
     }
+}
 
-    return true;
+int stack_pop_number()
+{
+    StackData data;
+    stack_pop(&data);
+    if (data.type != STACK_NUMBER)
+        assert(false);
+    return data.u.number;
+}
+
+char *stack_pop_name()
+{
+    StackData data;
+    stack_pop(&data);
+    if (data.type != STACK_NAME)
+        assert(false);
+
+    return data.u.name;
 }
 
 void test_stack()
 {
     stack_initialize();
-
     stack_push_number(12);
     stack_push_number(34);
-
-    StackData d;
-    stack_pop(&d);
-    assert(d.type == STACK_NUMBER);
-    assert(d.u.number == 34);
-
+    assert(34 == stack_pop_number());
     stack_push_name("foo");
-    stack_pop(&d);
-    assert(d.type == STACK_NAME);
-    assert(strcmp(d.u.name, "foo") == 0);
+    assert(strcmp(stack_pop_name(), "foo") == 0);
 }
 
 #if 0
