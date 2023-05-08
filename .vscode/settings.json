@@ -11,6 +11,8 @@
     "stack.h": "c",
     "parser.h": "c",
     "clesson.h": "c",
-    "stdbool.h": "c"
+    "stdbool.h": "c",
+    "dict.h": "c",
+    "type_traits": "c"
   }
 }

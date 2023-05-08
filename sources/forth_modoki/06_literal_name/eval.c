@@ -10,57 +10,17 @@ typedef struct
     StackData value;
 } KeyValue;
 
-// #define MAX_DIST_SIZE 1024
-// int dict_pos = 0;
-// KeyValue dict_array[MAX_DIST_SIZE];
-//
-// typedef struct
-//{
-//     int pos;
-//     int value;
-// } DictResult;
-//
-// bool dict_get(char *key, DictResult *o_result)
-//{
-//     int i = 0;
-//     for (i; i < dict_pos; i++)
-//     {
-//         if (strcmp(dict_array[i].key, key) == 0)
-//         {
-//             break;
-//         }
-//     }
-//
-//     if (dict_pos == i)
-//     {
-//         return false;
-//     }
-//
-//     o_result->value = dict_array[i].value.u.number;
-//     o_result->pos = i;
-//
-//     return true;
-// }
-//
-// void dict_push(char *key, int value)
-//{
-//     if (dict_pos == MAX_DIST_SIZE)
-//     {
-//         // stack overflow
-//         assert(false);
-//     }
-//
-//     DictResult r;
-//     if (dict_get(key, &r))
-//     {
-//         dict_array[r.pos].value.u.number = value;
-//         return;
-//     }
-//
-//     dict_array[dict_pos].key = key;
-//     dict_array[dict_pos].value.u.number = value;
-//     dict_pos++;
-// }
+void add_op()
+{
+    StackData s_data;
+    int l_v;
+    int r_v;
+    stack_pop(&s_data);
+    l_v = s_data.u.number;
+    stack_pop(&s_data);
+    r_v = s_data.u.number;
+    stack_push_number(l_v + r_v);
+}
 
 void eval()
 {
@@ -80,19 +40,6 @@ void eval()
 
         if (token.ltype == EXECUTABLE_NAME)
         {
-
-            if (strcmp(token.u.name, "add") == 0)
-            {
-                int l_v;
-                int r_v;
-                stack_pop(&s_data);
-                l_v = s_data.u.number;
-                stack_pop(&s_data);
-                r_v = s_data.u.number;
-                stack_push_number(l_v + r_v);
-                continue;
-            }
-
             if (strcmp(token.u.name, "def") == 0)
             {
                 int v;
@@ -101,7 +48,20 @@ void eval()
                 v = s_data.u.number;
                 stack_pop(&s_data);
                 literal_name = s_data.u.name;
-                dict_push(literal_name, v);
+                dict_push_number(literal_name, v);
+                continue;
+            }
+
+            NodeValue *v = dict_get(token.u.name);
+            // 辞書に存在しない
+            if (v == NULL)
+            {
+                assert(false);
+            }
+
+            if (v->type == NODE_FUNC)
+            {
+                v->u.cfunc();
                 continue;
             }
 
@@ -178,8 +138,14 @@ void test_eval_num_def()
     eval();
 }
 
+void register_primitives()
+{
+    dict_push_cfunc("add", add_op);
+}
+
 int main()
 {
+    register_primitives();
     test_eval_num_one();
     test_eval_num_two();
     test_eval_num_add();

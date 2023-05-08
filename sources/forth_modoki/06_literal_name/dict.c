@@ -5,7 +5,7 @@
 typedef struct Node
 {
     char *key;
-    int value;
+    NodeValue value;
     struct Node *next;
 } Node;
 
@@ -24,7 +24,33 @@ int hash(char *str)
     return (int)(val % TABLE_SIZE);
 }
 
-int dict_push(char *key, int value)
+void copy_value(NodeValue *from, NodeValue *to)
+{
+    to->type = from->type;
+    switch (to->type)
+    {
+    case NODE_NUMBER:
+        to->u.number = from->u.number;
+        break;
+    case NODE_FUNC:
+        to->u.cfunc = from->u.cfunc;
+        break;
+    default:
+        assert(false);
+        break;
+    }
+}
+
+Node *new_node(char *key, NodeValue *value)
+{
+    Node *node = (Node *)malloc(sizeof(Node));
+    node->next = NULL;
+    node->key = key;
+    copy_value(value, &node->value);
+    return node;
+}
+
+int dict_push(char *key, NodeValue *value)
 {
     int idx = hash(key);
     Node *head = node_array[idx];
@@ -34,40 +60,49 @@ int dict_push(char *key, int value)
     {
         // ポインタが指しているアドレスがNULLの場合、Node型のサイズ分メモリを確保して、
         // そのメモリのアドレスを配列にセットしなおす
-        head = (Node *)malloc(sizeof(Node));
-        head->next = NULL;
-        head->key = key;
-        head->value = value;
-        node_array[idx] = head;
+        node_array[idx] = new_node(key, value);
         return idx;
     }
 
     Node *node = head;
 
-    for (;;)
+    while (true)
     {
         // update
         if (strcmp(node->key, key) == 0)
         {
-            node->value = value;
+            copy_value(value, &node->value);
             break;
         }
-
         // insert
         if (node->next == NULL)
         {
-            Node *new_node = (Node *)malloc(sizeof(Node));
-            new_node->key = key;
-            new_node->value = value;
-            node->next = new_node;
+            node->next = new_node(key, value);
             break;
         }
         node = node->next;
     }
+
     return idx;
 }
 
-int *dict_get(char *key)
+int dict_push_number(char *key, int value)
+{
+    NodeValue node_value;
+    node_value.type = NODE_NUMBER;
+    node_value.u.number = value;
+    return dict_push(key, &node_value);
+}
+
+int dict_push_cfunc(char *key, void (*cfunc)())
+{
+    NodeValue node_value;
+    node_value.type = NODE_FUNC;
+    node_value.u.cfunc = cfunc;
+    return dict_push(key, &node_value);
+}
+
+NodeValue *dict_get(char *key)
 {
     int idx = hash(key);
     Node *head = node_array[idx];
@@ -84,7 +119,7 @@ int *dict_get(char *key)
     return NULL;
 }
 
-#ifdef INVESTIGATE
+#ifdef DEBUG
 
 void print_all()
 {
@@ -114,9 +149,9 @@ void test_insert_key()
     char *expect_key = "foo";
     int expect_value = 1;
 
-    int idx = dict_push(expect_key, expect_value);
+    int idx = dict_push_number(expect_key, expect_value);
     Node *head = node_array[idx];
-    assert(head->value = expect_value);
+    assert(head->value.u.number = expect_value);
     assert(strcmp(head->key, expect_key) == 0);
 }
 
@@ -125,9 +160,9 @@ void test_get()
     clear_node_array();
     char *expect_key = "foo";
     int expect_value = 1;
-    dict_push(expect_key, expect_value);
-    int *actual_value = dict_get(expect_key);
-    assert(*actual_value = expect_value);
+    dict_push_number(expect_key, expect_value);
+    NodeValue *actual_value = dict_get(expect_key);
+    assert(actual_value->u.number == expect_value);
 }
 
 void test_update_value()
@@ -135,16 +170,17 @@ void test_update_value()
     clear_node_array();
     char *expect_key = "foo";
     int expect_value = 10;
-    dict_push(expect_key, 1);
-    dict_push(expect_key, expect_value);
-    int *actual_value = dict_get(expect_key);
-    assert(*actual_value = expect_value);
+    dict_push_number(expect_key, 1);
+    dict_push_number(expect_key, expect_value);
+    NodeValue *actual_value = dict_get(expect_key);
+    assert(actual_value->u.number == expect_value);
 }
 
 void test_get_null()
 {
     clear_node_array();
-    int *actual_value = dict_get("foo");
+    NodeValue *actual_value = dict_get("foo");
+    assert(actual_value == NULL);
 }
 
 int main()
