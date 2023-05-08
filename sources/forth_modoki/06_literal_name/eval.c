@@ -22,6 +22,42 @@ void add_op()
     stack_push_number(l_v + r_v);
 }
 
+void sub_op()
+{
+    StackData s_data;
+    int l_v;
+    int r_v;
+    stack_pop(&s_data);
+    l_v = s_data.u.number;
+    stack_pop(&s_data);
+    r_v = s_data.u.number;
+    stack_push_number(r_v - l_v);
+}
+
+void mul_op()
+{
+    StackData s_data;
+    int l_v;
+    int r_v;
+    stack_pop(&s_data);
+    l_v = s_data.u.number;
+    stack_pop(&s_data);
+    r_v = s_data.u.number;
+    stack_push_number(l_v * r_v);
+}
+
+void div_op()
+{
+    StackData s_data;
+    int l_v;
+    int r_v;
+    stack_pop(&s_data);
+    l_v = s_data.u.number;
+    stack_pop(&s_data);
+    r_v = s_data.u.number;
+    stack_push_number(r_v / l_v);
+}
+
 void def_op()
 {
     StackData s_data;
@@ -138,6 +174,51 @@ void test_eval_num_add()
     assert(expect == actual);
 }
 
+void test_eval_num_sub()
+{
+    char *input = "10 2 sub";
+    int expect = 8;
+
+    cl_getc_set_src(input);
+
+    eval();
+
+    StackData s_data;
+    stack_pop(&s_data);
+    int actual = s_data.u.number;
+    assert(expect == actual);
+}
+
+void test_eval_num_mul()
+{
+    char *input = "10 2 mul";
+    int expect = 20;
+
+    cl_getc_set_src(input);
+
+    eval();
+
+    StackData s_data;
+    stack_pop(&s_data);
+    int actual = s_data.u.number;
+    assert(expect == actual);
+}
+
+void test_eval_num_div()
+{
+    char *input = "10 2 div";
+    int expect = 5;
+
+    cl_getc_set_src(input);
+
+    eval();
+
+    StackData s_data;
+    stack_pop(&s_data);
+    int actual = s_data.u.number;
+    assert(expect == actual);
+}
+
 void test_eval_num_def()
 {
     char *input = "/abc 123 def /efg 456 def abc efg add";
@@ -145,11 +226,19 @@ void test_eval_num_def()
 
     cl_getc_set_src(input);
     eval();
+
+    StackData s_data;
+    stack_pop(&s_data);
+    int actual = s_data.u.number;
+    assert(expect == actual);
 }
 
 void register_primitives()
 {
     dict_push_cfunc("add", add_op);
+    dict_push_cfunc("sub", sub_op);
+    dict_push_cfunc("mul", mul_op);
+    dict_push_cfunc("div", div_op);
     dict_push_cfunc("def", def_op);
 }
 
@@ -159,6 +248,9 @@ int main()
     test_eval_num_one();
     test_eval_num_two();
     test_eval_num_add();
+    test_eval_num_sub();
+    test_eval_num_mul();
+    test_eval_num_div();
     test_eval_num_def();
 
     return 0;
